@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+  <li><a href="/">Küsimustikud</a></li>
+  <li><a href="#">Ligipääsuload</a></li>
+{% endblock %}
+
+{% block jumbotron %}
+<h1>Registratuur</h1>
+<p>
+    Testi tegijal kontrolli isikut tõendavat dokumenti ning seejärel anna testi avamise kood paremal tulbas.
+    Juhul kui keegi peaks nimekirjast puudu olema, saab lisada uue testi tegija siin:
+</p>
+<form method="post" autocomplete="off">
+    {% csrf_token %}
+    <input type="text" name="identifier" placeholder="Isikukood">
+    <input type="submit"/>
+</form>
+{% endblock %}
+
+{% block content %}
+    <ul class="list-group">
+      {% for token in tokens %}
+        <li class="list-group-item" title="Generated {{ token.created }}" id="user_{{ token.user.id }}">
+
+          {% if token.invalidated %}
+            <span class="label label-default hidden-print">Tühistatud</span>
+          {% else %}
+            {% if token.submitted %}
+              <span class="label label-success hidden-print">Esitatud</span>
+            {% else %}
+
+              {% if token.expires and token.expires < now %}
+                <span class="label label-danger hidden-print">Aegunud</span>
+                {% else %}
+                  {% if token.used %}
+                    <span class="label label-warning hidden-print">Alustatud</span>
+                  {% else %}
+                  <span class="badge">{{ token.pin }}</span>
+                  <span class="label label-default hidden-print">Kehtiv</span>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+
+
+          {% endif %}
+
+
+            {{ token.user }}
+            <span class="hidden-print">
+                {{ token.quiz }}
+                {% if token.valid %}
+                alates
+                {{ token.valid }}
+                {% endif %}
+                {% if token.expires %}
+                kuni
+                {{ token.expires }}
+                {% endif %}
+            </span>
+        </li>
+      {% endfor %}
+    </ul>
+
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+  <li><a href="/">Küsimustikud</a></li>
+  <li><a href="#">Statistika</a></li>
+{% endblock %}
+
+{% block jumbotron %}
+      <h1>Statistika</h1>
+
+      <p>Vastuste variandid ning kui suur protsent neist täppi pandi</p>
+
+{% endblock %}
+
+{% block content %}
+    <ol class="list-group">
+      {% for answer in answers %}
+        <li class="list-group-item">
+          {% if req.user.is_staff %}
+            <span class="label label-info hidden-print" title="IP address of the submission">{{ submission.address }}</span>
+          {% endif %}
+
+
+          <span class="badge">{{ answer.ratio | floatformat }}%</span>
+          <a href="/stats/{{ answer.id }}/">
+            {{ answer.question }}
+            {% if answer.tick_expected %}
+                &#9745;
+            {% else %}
+                &#9744;
+            {% endif %}
+            {{ answer.answer }}
+          </a>
+        </li>
+      {% endfor %}
+    </ol>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+  <li><a href="/">Küsimustikud</a></li>
+  <li><a href="/stats/">Statistika</a></li>
+  <li><a href="#">{{ answer.title }}</a></li>
+{% endblock %}
+
+{% block jumbotron %}
+      <h1>Vastusevariandi statistika</h1>
+      <p>Vastusevariant on märgitud {% if answer.correct %}õigeks{% else %}valeks{% endif %}</p>
+      <p>Q: {{ answer.question }}</p>
+      <p>A: {{ answer.title }}</p>
+{% endblock %}
+
+{% block content %}
+    <ol class="list-group">
+      {% for submission in submissions %}
+        <li class="list-group-item">
+          {% if submission.correct %}
+            <span class="label label-success">vastati õigesti</span>
+          {%else %}
+            <span class="label label-danger">vastati valesti</span>
+          {% endif %}
+          {{ submission.submission.examinee }}
+          <span class="badge" title="Vastuse esitamise aeg">{{ submission.submission.created }}</span>
+        </li>
+      {% endfor %}
+    </ol>
+{% endblock %}

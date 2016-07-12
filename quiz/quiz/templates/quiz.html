@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+
+{% block breadcrumb %}
+  <li><a href="/">Küsimustikud</a></li>
+  <li><a href="#">{{ quiz.title }}</a></li>
+{% endblock %}
+
+{% block jumbotron %}
+  <h1>{{ quiz.title }}</h1>
+  <p>
+    Vali vastusevariandid mis on õiged.
+    Iga vastusevariandi eest saab vastavalt küsimuse keerukusele 1-4 punkti.
+    Vale vastusevariandi valides ei saa ühtegi punkti selle küsimuse eest.
+    Kokku on võimalik saada 100 punkti.
+
+    {% if deadline %}
+    <b>Esita vastused hiljemalt {{ deadline }}.</b>
+    {% endif %}
+
+    <div class="hidden-print">
+      {% if req.user.is_staff %}
+        <ul>
+          {% for difficulty, count in quiz.distribution %}
+            <li>{{ difficulty }}: {{ count}}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </p>
+{% endblock %}
+
+{% block content %}
+  <div class="hidden-print">
+    {% if quiz.published %}
+        {% if quiz.published > now %}
+          It will be available {{ quiz.published }}, in {{ remaining }}
+        {% endif %}
+    {% elif not token %}
+        Quiz not published yet!
+    {% endif %}
+
+  </div>
+
+  {% if token or quiz.published < now or req.user.is_staff %}
+
+
+    <form action="/submission/" method="post" autocomplete="off">
+      {% csrf_token %}
+      {% if token %}
+      <input type="hidden" name="token" value="{{ token.id }}"/>
+      {% endif %}
+      <input type="hidden" name="quiz_id" value="{{ quiz.id }}"/>
+
+      {% for question, answers in questions %}
+        <h3>{{ question.title }}</h3>
+        <ol>
+          {% for answer in answers %}
+            <li class="checkbox">
+              <label>
+                <input type="hidden" name="{{ answer.tag }}" value="0"/>
+                <input type="checkbox" name="{{ answer.tag }}" id="{{ answer.tag }}"/> {{ answer.title }}
+              </label>
+            </li>
+          {% endfor %}
+        </ol>
+      {% endfor %}
+      {% if req.user.is_staff %}
+      <div class="hidden-print">
+        Administraatorina ei saa küsimustikku täita,
+        käesolev vaade on ette nähtud printimiseks juhul kui testi tegija
+        ei saa küsimustikku arvutis täita.
+        Printimiseks kasuta Chrome/Chromiu lehitsejat, Firefox ei toeta osade elementide peitmist printimisel!
+      </div>
+
+      {% else %}
+      <input type="submit"/>
+      {% endif %}
+    </form>
+  {% endif %}
+
+
+
+  {% if req.user.is_staff %}
+    <div style="page-break-before: always;">
+      <h2>Answers ({{ points }}p)</h2>
+      {% for question, answers in questions %}
+        <h3>{{ question.title }}</h3>
+        <ol>
+          {% for answer in answers %}
+            <li>
+              {% if answer.correct %}	&#9745;{% else %}&#9744;{% endif %} {{ answer.title }} ({% if answer.correct %}+{{ question.difficulty}}p{% else %}0p{% endif %})
+            </li>
+          {% endfor %}
+        </ol>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

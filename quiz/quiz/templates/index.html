@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+  <li><a href="#">Küsimustikud</a></li>
+{% endblock %}
+
+{% block jumbotron %}
+<h1>Küsimustikud</h1>
+<p>Vali küsimustik</p>
+{% endblock %}
+
+{% block content %}
+    <ul class="list-group">
+      {% if tokens or quizzes %}
+          {% for token in tokens %}
+            <li class="list-group-item">
+              {{ token.quiz }}
+              <form action="/unlock/" method="get" autocomplete="off">
+                <input type="hidden" name="username" value="{{ req.user.username }}"/>
+                <input type="number" name="code" value="" placeholder="Kood"/>
+                <input type="submit" class="btn btn-primary btn-sm" value="Alusta"/>
+              </form>
+            </li>
+          {% endfor %}
+
+
+          {% for quiz in quizzes %}
+            <li class="list-group-item">
+              <a href="/quiz/{{ quiz.slug }}/">{{ quiz }}</a>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li class="alert alert-warning" style="list-style-type:none;">
+              {% if req.user.is_authenticated %}
+                {{ req.user }} jaoks pole ette nähtud ühtegi küsimustikku täitmiseks
+              {% else %}
+                Avalikult kättesaadavaks pole tehtud ühtegi küsimustikku, proovige sisse logida ID-kaardiga.
+                Vajadusel sulgege veebilehitseja ning avage Google Chrome uuesti.
+              {% endif %}
+          </li>
+        {% endif %}
+    </ul>
+
+    {% if not req.user.is_authenticated %}
+      <p>ID-kaardi puudumisel saate testi alustada ka isikukoodi abil:</p>
+      <form method="get" action="/unlock/" autocomplete="off">
+        {% csrf_token %}
+        <input type="number" name="username" placeholder="Isikukood"/>
+        <input type="number" name="code" placeholder="Testi avamise kood"/>
+        <input type="submit">
+      </form>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,111 @@
+{% load tz %}
+{% timezone "Europe/Tallinn" %}
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <title>{% block title %}Küsimustikud{% endblock %}</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+
+    <style>
+        body {
+          padding-top: 70px;
+          padding-bottom: 30px;
+        }
+
+        .theme-dropdown .dropdown-menu {
+          position: static;
+          display: block;
+          margin-bottom: 20px;
+        }
+
+        .theme-showcase > p > .btn {
+          margin: 5px 0;
+        }
+
+        .theme-showcase .navbar .container {
+          width: auto;
+        }
+
+        svg { display: block; margin: 0 auto; }
+
+        h1, h2, h3, h4, h5, h6 { font-size: 70%; }
+
+        body { counter-reset: h1; counter-reset: h2; counter-reset: h3;}
+        h1 {counter-reset: h2}
+        h2 {counter-reset: h3}
+        h3 {counter-reset: h4}
+        h4 {counter-reset: h5}
+        h5 {counter-reset: h6}
+
+
+        h3:before {counter-increment: h3; content: counter(h3) ". "}
+        h4:before {counter-increment: h4; content: counter(h3) "." counter(h4) ". "}
+        h5:before {counter-increment: h5; content:counter(h3) "." counter(h4) "." counter(h5) ". "}
+        h6:before {counter-increment: h6; content: counter(h3) "." counter(h4) "." counter(h5) "." counter(h6) ". "}
+        @media print { input[type='submit'] { display: none; }}
+        h2.nocount:before, h3.nocount:before, h4.nocount:before, h5.nocount:before, h6.nocount:before { content: ""; counter-increment: none }
+
+        ol {     list-style-type: lower-alpha; };
+        body, h1, h2, h3, p {font-family:"Roboto Condensed", Helvetica, Arial, sans-serif !imporant;}
+    </style>
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+</head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">quiz.koodur.com</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Küsimustikud</a></li>
+
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/token/">Registreerimine</a></li>
+            <li><a href="/results/">Tulemused</a></li>
+            <li><a href="/stats/">Statistika</a></li>
+            <li><a href="/admin/">Administreerimine</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+        <ol class="breadcrumb hidden-print">
+          {% block breadcrumb %}
+          {% endblock %}
+
+        </ol>
+
+        <div class="jumbotron hidden-print">
+          {% block jumbotron %}{% endblock %}
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <p class="alert alert-danger">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+        <div class="hidden-print">
+            {% include "itcollege.svg" %}
+            <a href="http://github.com/laurivosandi/" target="_blank" style="opacity:0.5; margin: 0 auto; width: 400px; text-align: center; display: block;">
+            Made with Ubuntu, Python & Coffee
+            </a>
+        </div>
+    </div>
+  </body>
+</html>
+{% endtimezone %}
+
