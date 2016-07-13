@@ -153,17 +153,18 @@ def submission(req, submission_id):
 @transaction.atomic
 def submit(req):
     now = timezone.now()
-    quiz=Quiz.objects.get(pk=req.POST.get("quiz_id"))
+    quiz = Quiz.objects.get(pk=req.POST.get("quiz_id"))
 
     # The quiz has to be accessible either using a token
     if quiz.tokenized:
         try:
             token = QuizToken.objects.get(
-                invalidated__isnull=True,
+                invalidated__isnull=True, # Token has not been invalidated by any newer tokens
+                submitted__isnull=True,   # Quiz has not been submitted yet
+                used__isnull=False,       # Quiz has been displayed
                 id=req.POST.get("token"),
                 ip=req.META.get("REMOTE_ADDR"),
-                user_agent = req.META.get('HTTP_USER_AGENT'),
-                used__isnull=False)
+                user_agent = req.META.get('HTTP_USER_AGENT'))
         except QuizToken.DoesNotExist:
             messages.error(req, 'Vale kood!')
             return redirect("/")
